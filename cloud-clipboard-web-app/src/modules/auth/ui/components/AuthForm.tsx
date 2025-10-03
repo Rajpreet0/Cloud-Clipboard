@@ -10,8 +10,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/client";
+import { ForgotPasswordFormValues, forgotPasswordSchema } from "../../schemas/forgot-password-schema";
+import { resetPasswordSchema, ResetPasswordValues } from "../../schemas/reset-password-schema";
 
-type AuthFormType = "signup" | "login";
+type AuthFormType = "signup" | "login" | "forgotPassword" | "resetPassword";
 
 interface AuthFormProps {
   type: AuthFormType;
@@ -23,21 +25,40 @@ interface AuthFormProps {
 const AuthForm: React.FC<AuthFormProps> = ({type}) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const schema = type === "signup" ? signUpSchema : signInSchema;
 
-    const form = useForm<SignUpFormValues | SignInFormValues>({
+    let schema;
+    let defaultValues: any;
+
+    if (type === "signup") {
+      schema = signUpSchema;
+      defaultValues = {
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      };
+    } else if (type === "login") {
+      schema = signInSchema;
+      defaultValues = {
+        email: "",
+        password: "",
+      };
+    } else if (type === "forgotPassword") {
+      schema = forgotPasswordSchema;
+      defaultValues = {
+        email: "",
+      };
+    } else {
+      schema = resetPasswordSchema;
+      defaultValues = {
+        password: "",
+        confirmPassword: "",
+      }
+    }
+
+    const form = useForm<SignUpFormValues | SignInFormValues | ForgotPasswordFormValues | ResetPasswordValues>({
         resolver: zodResolver(schema),
-        defaultValues: 
-          type === "signup" 
-            ? {
-              username: "",
-              email: "",
-              password: "",
-              confirmPassword: "",
-            } : {
-              email: "",
-              password: "",
-            }
+        defaultValues,
     });
 
     const onSubmit = async (values: any) => {
@@ -61,7 +82,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           
           toast.success("Account created! Please check your email to verify.");
           form.reset();
-         } else {
+         } else if (type === "login") {
           // LOGIN WITH SUPABASE
           const { error } = await supabase.auth.signInWithPassword({
             email: values.email,
@@ -73,6 +94,22 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           toast.success("Welcome back!");
           form.reset();
           router.push("/dashboard");
+        } else if (type === "forgotPassword") {
+          const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+            redirectTo: `${window.location.origin}/auth/reset-password`,
+          });
+
+          if (error) throw error;
+          toast.success("Password reset link sent! Please check your email.");
+          form.reset();
+        } else if (type === "resetPassword") {
+          const { error } = await supabase.auth.updateUser({
+            password: values.password,
+          });
+
+          if (error) throw error;
+          toast.success("Password updated successfully!");
+          router.push("/auth/sign-in");
         }
        } catch(error: any) {
         toast.error(error.message || "Something went wrong.");
@@ -101,33 +138,37 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           />
         )}
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} type="email" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {type !== "resetPassword" && (
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} type="email" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input {...field} type="password" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {type !== "forgotPassword" && type !== "resetPassword" && (
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {type === "signup" && (
           <FormField
@@ -145,26 +186,69 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           />
         )}
 
+        {type === "resetPassword" && (
+          <>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
+
 
 
         <Button type="submit" className="w-full bg-gray-900 text-white cursor-pointer hover:bg-gray-800 transition">
-          {loading ? "Loading..." : type === "signup" ? "Sign Up" : "Login"}
+          {loading 
+            ? "Loading..."
+            : type === "signup" 
+            ? "Sign Up" 
+            : type === "login" 
+            ? "Login" 
+            : type === "forgotPassword" 
+            ? "Send Reset Link" 
+            : "Update Password"}
         </Button>
 
-        <Button
-          type="button"
-          className="w-full bg-transparent text-black border cursor-pointer border-gray-300 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
-        >
-          <FcGoogle size={22} />
-          {type === "signup" ? "Sign Up with Google" : "Login with Google"}
-        </Button>
+        {type !== "forgotPassword" && type !== "resetPassword" && (
+          <Button
+            type="button"
+            className="w-full bg-transparent text-black border cursor-pointer border-gray-300 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
+          >
+            <FcGoogle size={22} />
+            {type === "signup" ? "Sign Up with Google" : "Login with Google"}
+          </Button>
+        )}
 
-        <p className="text-sm text-black/50 hover:underline cursor-pointer text-center"
-          onClick={() => {
-            router.push(type === "signup" ? "/auth/forgot-password" : "/auth/sign-up")
-          }}>
-          {type === "signup" ? "Forgot Password" : "Don't have an account? Sign Up"}
-        </p>
+        {type !== "resetPassword" && (
+          <p className="text-sm text-black/50 hover:underline cursor-pointer text-center"
+            onClick={() => {
+              router.push(type === "forgotPassword" ? "/auth/sign-in" : "/auth/forgot-password")
+            }}>
+            {type === "forgotPassword" ? "Back to Login" : "Forgot Password"}
+          </p>
+        )}
       </form>
     </Form>
   )
