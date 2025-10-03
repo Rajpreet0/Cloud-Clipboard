@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./client";
 
 /**
- * Custom Hook to manage Supbase authentication session
+ * Custom Hook to manage Supabase authentication session
  */
 export function useSupabaseSession() {
     // State to store the current session (null if not logged in)
@@ -13,7 +13,10 @@ export function useSupabaseSession() {
     useEffect(() => {
         // Fetch current session from supabse
         const getSession = async () => {
-            const {data} = await supabase.auth.getSession();
+            const {data, error} = await supabase.auth.getSession();
+            if (error) {
+                console.error("Failed to fetch session: ", error);
+            }
             setSession(data.session);
             setLoading(false);
         }
