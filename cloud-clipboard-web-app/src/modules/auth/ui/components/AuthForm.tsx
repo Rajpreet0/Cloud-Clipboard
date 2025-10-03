@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { SignInFormValues, signInSchema } from "../../schemas/sign-in-schema";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase/client";
 
 type AuthFormType = "signup" | "login";
 
@@ -14,9 +17,12 @@ interface AuthFormProps {
   type: AuthFormType;
 }
 
-
+/*
+ *  Abstract Auth Form for Login and SignUp
+ */
 const AuthForm: React.FC<AuthFormProps> = ({type}) => {
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
     const schema = type === "signup" ? signUpSchema : signInSchema;
 
     const form = useForm<SignUpFormValues | SignInFormValues>({
@@ -34,8 +40,45 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
             }
     });
 
-    const onSubmit = (values: any) => {
-        console.log(`${type.toUpperCase()} values:`, values);
+    const onSubmit = async (values: any) => {
+       setLoading(true);
+
+       try {
+         if (type === "signup") {
+          // SIGN UP WITH SUPABASE
+          const { error } = await supabase.auth.signUp({
+            email: values.email,
+            password: values.password,
+            options: {
+              data: {
+                username: values.username,
+              },
+              emailRedirectTo: `${window.location.origin}/dashboard`
+            },
+          });
+
+          if (error) throw error;
+          
+          toast.success("Account created! Please check your email to verify.");
+          form.reset();
+         } else {
+          // LOGIN WITH SUPABASE
+          const { error } = await supabase.auth.signInWithPassword({
+            email: values.email,
+            password: values.password,
+          });
+
+          if (error) throw error;
+
+          toast.success("Welcome back!");
+          form.reset();
+          router.push("/dashboard");
+        }
+       } catch(error: any) {
+        toast.error(error.message || "Something went wrong.");
+       } finally {
+        setLoading(false);
+       }
     }
 
 
@@ -105,7 +148,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
 
 
         <Button type="submit" className="w-full bg-gray-900 text-white cursor-pointer hover:bg-gray-800 transition">
-          {type === "signup" ? "Sign Up" : "Login"}
+          {loading ? "Loading..." : type === "signup" ? "Sign Up" : "Login"}
         </Button>
 
         <Button
