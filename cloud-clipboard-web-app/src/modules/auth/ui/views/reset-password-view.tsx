@@ -3,8 +3,13 @@
 import AuthBackground from "../components/AuthBackground";
 import AuthCard from "../components/AuthCard";
 import AuthForm from "../components/AuthForm";
+import { useAuthRedirect } from "@/hook/useAuthRedirect";
 
 const ResetPasswordView = () => {
+
+    useAuthRedirect({ requireAuth: false, redirectTo: "/dashboard" });
+
+
   return (
     <AuthBackground>
         <AuthCard
