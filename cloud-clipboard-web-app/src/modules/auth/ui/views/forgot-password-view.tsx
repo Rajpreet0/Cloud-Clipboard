@@ -2,14 +2,11 @@
 import AuthBackground from '../components/AuthBackground'
 import AuthCard from '../components/AuthCard'
 import AuthForm from '../components/AuthForm'
-import { useRouter } from 'next/navigation'
 import { useAuthRedirect } from '@/hook/useAuthRedirect'
 
 const ForgotPasswordView = () => {
 
-  
-    const router = useRouter();
-    useAuthRedirect({ requireAuth: false, redirectTo: "/dashboard" });
+  useAuthRedirect({ requireAuth: false, redirectTo: "/dashboard" });
 
   return (
     <AuthBackground>

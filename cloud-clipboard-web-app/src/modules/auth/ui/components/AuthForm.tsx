@@ -25,6 +25,7 @@ interface AuthFormProps {
 const AuthForm: React.FC<AuthFormProps> = ({type}) => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
 
     let schema;
     let defaultValues: any;
@@ -118,9 +119,9 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
        }
     }
 
-    const handleGoogelAuth = async () => {
+    const handleGoogleAuth = async () => {
       try {
-        setLoading(true);
+        setGoogleLoading(true);
 
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
@@ -133,7 +134,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
       } catch (error: any) {
         toast.error(error.message || "Google sign-in failed.");
       } finally {
-        setLoading(false);
+        setGoogleLoading(false);
       }
     }
 
@@ -252,12 +253,12 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
         {type !== "forgotPassword" && type !== "resetPassword" && (
           <Button
             type="button"
-            onClick={handleGoogelAuth}
-            disabled={loading}
+            onClick={handleGoogleAuth}
+            disabled={loading || googleLoading}
             className="w-full bg-transparent text-black border cursor-pointer border-gray-300 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
           >
             <FcGoogle size={22} />
-            {type === "signup" ? "Sign Up with Google" : "Login with Google"}
+            {googleLoading ? "Signing in..." : type === "signup" ? "Sign Up with Google" : "Sign in with Google"}
           </Button>
         )}
 
