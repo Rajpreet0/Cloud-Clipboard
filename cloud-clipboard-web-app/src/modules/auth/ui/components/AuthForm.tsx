@@ -118,6 +118,24 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
        }
     }
 
+    const handleGoogelAuth = async () => {
+      try {
+        setLoading(true);
+
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: `${window.location.origin}/dashboard`,
+          },
+        });
+
+        if (error) throw error;
+      } catch (error: any) {
+        toast.error(error.message || "Google sign-in failed.");
+      } finally {
+        setLoading(false);
+      }
+    }
 
   return (
     <Form {...form}>
@@ -234,6 +252,8 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
         {type !== "forgotPassword" && type !== "resetPassword" && (
           <Button
             type="button"
+            onClick={handleGoogelAuth}
+            disabled={loading}
             className="w-full bg-transparent text-black border cursor-pointer border-gray-300 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
           >
             <FcGoogle size={22} />

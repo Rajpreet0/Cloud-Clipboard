@@ -3,11 +3,13 @@ import { useRouter } from "next/navigation";
 import AuthBackground from "../components/AuthBackground"
 import AuthCard from "../components/AuthCard"
 import AuthForm from "../components/AuthForm"
+import { useAuthRedirect } from "@/hook/useAuthRedirect";
 
 
 const SignInView = () => {
 
   const router = useRouter();
+  useAuthRedirect({ requireAuth: false, redirectTo: "/dashboard" });
 
   return (
     <AuthBackground>

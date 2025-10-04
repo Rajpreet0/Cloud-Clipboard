@@ -1,21 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAuthRedirect } from "@/hook/useAuthRedirect";
 import { supabase } from "@/lib/supabase/client";
 import { useSupabaseSession } from "@/lib/supabase/session";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+
 
 const DashboardView = () => {
 
     const router = useRouter();
     const {session, loading} = useSupabaseSession();
-
-    useEffect(() => {
-        if (!loading && !session) {
-            router.replace("/auth/sign-in");
-        }
-    }, [loading, session, router]);
+    useAuthRedirect({ requireAuth: true });
 
     if (loading) {
         return (
@@ -49,12 +45,10 @@ const DashboardView = () => {
             <span className="font-semibold text-gray-800">User ID:</span>{" "}
             {user.id}
           </p>
-          {user.user_metadata?.username && (
-            <p>
+          <p>
               <span className="font-semibold text-gray-800">Username:</span>{" "}
-              {user.user_metadata.username}
-            </p>
-          )}
+              {user.user_metadata?.username ? user.user_metadata.username : user.user_metadata?.full_name || user.email?.split("@")[0] || "No Username"}
+          </p>
           <p>
             <span className="font-semibold text-gray-800">Created:</span>{" "}
             {new Date(user.created_at).toLocaleString()}
