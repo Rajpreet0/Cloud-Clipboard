@@ -66,7 +66,7 @@ const DashboardSidebar = () => {
                         )}
                         isActive={pathname === item.href}>
                         <Link href={item.href}>
-                          <item.icon className={`${pathname === item.href && "text-blue"}`}/>
+                          <item.icon className={cn(pathname === item.href && "text-blue")}/>
                           <span className={`${pathname === item.href && "text-blue"} text-md font-medium tracking-tight`}>
                               {item.label}
                           </span>
