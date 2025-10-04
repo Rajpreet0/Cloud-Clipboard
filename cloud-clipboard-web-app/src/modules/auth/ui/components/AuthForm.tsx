@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/client";
 import { ForgotPasswordFormValues, forgotPasswordSchema } from "../../schemas/forgot-password-schema";
 import { resetPasswordSchema, ResetPasswordValues } from "../../schemas/reset-password-schema";
+import { Spinner } from "@/components/ui/spinner";
 
 type AuthFormType = "signup" | "login" | "forgotPassword" | "resetPassword";
 
@@ -240,7 +241,11 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
 
         <Button type="submit" className="w-full bg-gray-900 text-white cursor-pointer hover:bg-gray-800 transition">
           {loading 
-            ? "Loading..."
+            ? 
+            <div className="flex items-center gap-4">
+              <Spinner/>
+              <p>Loading...</p>
+            </div>
             : type === "signup" 
             ? "Sign Up" 
             : type === "login" 
@@ -258,7 +263,15 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
             className="w-full bg-transparent text-black border cursor-pointer border-gray-300 flex items-center justify-center gap-2 hover:bg-gray-100 transition"
           >
             <FcGoogle size={22} />
-            {googleLoading ? "Signing in..." : type === "signup" ? "Sign Up with Google" : "Sign in with Google"}
+            {googleLoading 
+              ?             
+              <div className="flex items-center gap-4">
+                <Spinner/>
+                <p>Loading...</p>
+              </div>
+              : type === "signup" 
+              ? "Sign Up with Google" 
+              : "Sign in with Google"}
           </Button>
         )}
 
