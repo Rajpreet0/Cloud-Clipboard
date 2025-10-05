@@ -1,0 +1,155 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String        @id @default(uuid())
+  email             String        @unique
+  fullName          String?
+  avatarUrl         String?
+  createdAt         DateTime      @default(now())
+  
+  devices           Device[]
+  clips             Clip[]
+  favorites         Favorite[]
+  teamsCreated      Team[]        @relation("TeamCreator") 
+  teamMembers       TeamMember[]
+  settings          Setting?
+  sharedClipsAdded  SharedClip[]
+
+  @@map("users")
+}
+
+model Device {
+  id          String    @id @default(uuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String 
+  name        String
+  platform    Platform
+  online      Boolean   @default(false)
+  lastSync    DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+
+  clips Clip[]
+
+  @@map("devices")
+}
+
+model Clip {
+  id          String    @id @default(uuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  device      Device?   @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  deviceId    String?
+  content     String
+  type        ClipType  @default(TEXT)
+  isFavorite  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, createdAt])
+  @@map("clips")
+}
+
+model Favorite {
+  id          String    @id @default(uuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  title       String
+  content     String
+  category    String?
+  sharedWith  Team?     @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  teamId      String?
+  createdAt   DateTime  @default(now())
+
+  @@map("favorites")
+}
+
+model Team {
+  id            String    @id @default(uuid())
+  name          String
+  createdBy     User      @relation("TeamCreator", fields: [createdById], references: [id])
+  createdById   String
+  createdAt     DateTime  @default(now())
+
+  members       TeamMember[]
+  sharedClips   SharedClip[]
+  favorites     Favorite[]
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id            String    @id @default(uuid())
+  team          Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  role          TeamRole  @default(VIEWER)
+  joinedAt      DateTime  @default(now())
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+model SharedClip {
+  id            String    @id @default(uuid())
+  team          Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId        String
+  addedBy       User      @relation(fields: [addedById], references: [id])
+  addedById     String
+  title         String?
+  content       String
+  created       DateTime  @default(now())
+
+  @@map("shared_clips") 
+}
+
+model Setting {
+  id              String      @id @default(uuid())
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String      @unique
+  syncFrequency   Int         @default(60)
+  shortcuts       Json?
+  cloudLimitMb    Int         @default(100)
+  createdAt       DateTime    @default(now())
+
+  @@map("settings")
+}
+
+
+
+// --- ENUMS ---
+
+enum Platform {
+  WINDOWS
+  MAC
+  LINUX
+  IOS
+  ANDROID
+}
+
+enum ClipType {
+  TEXT
+  IMAGE
+  FILE
+  CODE
+}
+
+enum TeamRole {
+  ADMIN
+  EDITOR
+  VIEWER
+}
