@@ -67,7 +67,7 @@ const DashboardUserButton = () => {
                     <DrawerFooter>
                         <Button
                             variant="outline"
-                            onClick={() => {}}>
+                            onClick={() => router.push("/settings")}>
                                 <Settings className="size-4"/>
                                 Settings 
                         </Button>
@@ -124,7 +124,9 @@ const DashboardUserButton = () => {
                 </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator/>
-            <DropdownMenuItem className="cursor-pointer flex items-center justify-between">
+            <DropdownMenuItem 
+                onClick={() => router.push("/settings")}
+                className="cursor-pointer flex items-center justify-between">
                 Settings <Settings className="size-4"/>
             </DropdownMenuItem>
             <DropdownMenuItem
