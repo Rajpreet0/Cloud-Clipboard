@@ -1,10 +1,11 @@
+import { User } from "@supabase/supabase-js";
 import { getDisplayName } from "./getDisplayName";
 
-export const saveUserToDB = async (supabaseUser: any) => {
+export const saveUserToDB = async (supabaseUser: User | null) => {
       if (!supabaseUser) return;
 
       try {
-        await fetch("/api/users", {
+        const response = await fetch("/api/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -14,7 +15,15 @@ export const saveUserToDB = async (supabaseUser: any) => {
             avatarUrl: supabaseUser.user_metadata?.avatar_url || null,
           }),
         });
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({ error: "Unkown error" }));
+          throw new Error(`Failed to save user: ${error.error || response.statusText}`);
+        }
+
+        return await response.json();
       } catch (err) {
         console.error("Error saving user: ", err);
+        throw err;
       }
 }
