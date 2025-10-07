@@ -17,7 +17,7 @@ export const saveUserToDB = async (supabaseUser: User | null) => {
         });
 
         if (!response.ok) {
-          const error = await response.json().catch(() => ({ error: "Unkown error" }));
+          const error = await response.json().catch(() => ({ error: "Unknown error" }));
           throw new Error(`Failed to save user: ${error.error || response.statusText}`);
         }
 
