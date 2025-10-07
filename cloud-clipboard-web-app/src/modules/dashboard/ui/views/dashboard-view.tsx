@@ -2,12 +2,23 @@
 
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import { saveUserToDB } from "@/lib/saveUserToDB";
+import { supabase } from "@/lib/supabase/client";
 import { useSupabaseSession } from "@/lib/supabase/session";
+import { useEffect } from "react";
 
 
 const DashboardView = () => {
-    const { loading} = useSupabaseSession();
+    const {loading} = useSupabaseSession();
     useAuthRedirect({ requireAuth: true });
+
+    useEffect(() => {
+      const syncUser = async () => {
+        const { data } = await supabase.auth.getUser();
+        if (data?.user) await saveUserToDB(data.user);
+      };
+      syncUser();
+    }, []);
 
     if (loading) {
         return (
