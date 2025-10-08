@@ -7,7 +7,7 @@ export async function getDeviceInfo() {
     const parser = new UAParser();
     const result = parser.getResult();
 
-    let ip = "Unkown";
+    let ip = "Unknown";
     try {
         const res = await fetch("https://api.ipify.org?format=json");
         const data = await res.json();
@@ -26,8 +26,8 @@ export async function getDeviceInfo() {
     }
 
     return {
-        browser: result.browser.name  || "Unkown",
-        os: result.os.name || "Unkown",
+        browser: result.browser.name  || "Unknown",
+        os: result.os.name || "Unknown",
         device: result.device.type || "Desktop",
         ip,
         fingerprint

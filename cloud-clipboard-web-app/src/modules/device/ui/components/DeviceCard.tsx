@@ -15,6 +15,7 @@ interface DeviceCardProps {
   ip: string;
   fingerprint: string;
   isOnline: boolean;
+  lastSeenAt?: string;
 }
 
 const DeviceCard: React.FC<DeviceCardProps> = ({
@@ -24,6 +25,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   ip,
   fingerprint,
   isOnline,
+  lastSeenAt
 }) => {
 
     const browserIcon = getBrowserIcon(browser);
@@ -61,14 +63,14 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
                 {browser || "Unbekannter Browser"}
               </p>
               <p className="text-gray-400 text-xs sm:text-sm">
-                Last Seen At: 08.10.2025 01:19
+                Last Seen At: {lastSeenAt || "N/A"}
               </p>
             </div>
 
             <a
               href={`https://tools.keycdn.com/geo?host=${ip}`}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="text-sm sm:text-base text-gray-700"
             >
               IP address:{" "}
