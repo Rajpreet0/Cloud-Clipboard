@@ -1,9 +1,8 @@
-import React from 'react'
+import DeviceView from '@/modules/device/ui/views/device-view'
+
 
 const Device = () => {
-  return (
-    <div>Device</div>
-  )
+  return <DeviceView/>
 }
 
 export default Device
