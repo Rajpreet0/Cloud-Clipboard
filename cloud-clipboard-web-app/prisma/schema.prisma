@@ -36,11 +36,15 @@ model Device {
   id          String    @id @default(uuid())
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String 
-  name        String
-  platform    Platform
+  fingerprint String
+  browser     String
+  os          String
+  deviceType  String
+  ip          String
   online      Boolean   @default(false)
-  lastSync    DateTime  @default(now())
+  lastSeenAt  DateTime  @default(now())
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   clips Clip[]
 
@@ -132,14 +136,6 @@ model Setting {
 
 
 // --- ENUMS ---
-
-enum Platform {
-  WINDOWS
-  MAC
-  LINUX
-  IOS
-  ANDROID
-}
 
 enum ClipType {
   TEXT
