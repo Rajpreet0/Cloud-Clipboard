@@ -41,7 +41,7 @@ model Device {
   os          String
   deviceType  String
   ip          String
-  online      Boolean   @default(false)
+  isOnline    Boolean   @default(true)
   lastSeenAt  DateTime  @default(now())
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -49,6 +49,7 @@ model Device {
   clips Clip[]
 
   @@map("devices")
+  @@unique([fingerprint, userId])
 }
 
 model Clip {
