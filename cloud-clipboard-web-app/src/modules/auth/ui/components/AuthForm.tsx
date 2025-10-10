@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase/client";
 import { ForgotPasswordFormValues, forgotPasswordSchema } from "../../schemas/forgot-password-schema";
 import { resetPasswordSchema, ResetPasswordValues } from "../../schemas/reset-password-schema";
 import { Spinner } from "@/components/ui/spinner";
+import { registerDevice } from "@/lib/registerDevice";
 
 type AuthFormType = "signup" | "login" | "forgotPassword" | "resetPassword";
 
@@ -81,6 +82,11 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           });
 
           if (error) throw error;
+
+          const { data } = await supabase.auth.getUser();
+          const user = data?.user;
+
+          if (user?.id) await registerDevice(user.id);
           
           toast.success("Account created! Please check your email to verify.");
           form.reset();
@@ -92,6 +98,12 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           });
 
           if (error) throw error;
+
+
+          const { data } = await supabase.auth.getUser();
+          const user = data?.user;
+
+          if (user?.id) await registerDevice(user.id);
 
           toast.success("Welcome back!");
           form.reset();
@@ -132,6 +144,11 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
         });
 
         if (error) throw error;
+
+        const { data } = await supabase.auth.getUser();
+        const user = data?.user;
+
+        if (user?.id) await registerDevice(user.id);
       } catch (error: any) {
         toast.error(error.message || "Google sign-in failed.");
       } finally {

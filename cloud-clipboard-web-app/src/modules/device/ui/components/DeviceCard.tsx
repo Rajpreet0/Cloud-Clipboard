@@ -2,9 +2,6 @@ import TooltipAbstract from '@/components/tooltipAbstract';
 import { Card, CardContent } from '@/components/ui/card';
 import { LogOut } from 'lucide-react';
 import React from 'react';
-import { AiOutlineWindows } from "react-icons/ai";
-import { FaDesktop } from "react-icons/fa";
-import ChromeIcon from "../../../../../public/icons/chrome.png";
 import Image from 'next/image';
 import { getBrowserIcon, getDeviceIcon, getOsIcon } from '@/lib/deviceIcons';
 
