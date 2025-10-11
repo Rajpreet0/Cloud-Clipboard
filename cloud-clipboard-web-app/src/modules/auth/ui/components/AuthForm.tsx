@@ -14,6 +14,7 @@ import { ForgotPasswordFormValues, forgotPasswordSchema } from "../../schemas/fo
 import { resetPasswordSchema, ResetPasswordValues } from "../../schemas/reset-password-schema";
 import { Spinner } from "@/components/ui/spinner";
 import { registerDevice } from "@/lib/registerDevice";
+import { useAuthStore } from "@/store/useAuthStore";
 
 type AuthFormType = "signup" | "login" | "forgotPassword" | "resetPassword";
 
@@ -29,6 +30,8 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
 
+    const { setSession } = useAuthStore.getState();
+ 
     let schema;
     let defaultValues: any;
 
@@ -70,7 +73,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
        try {
          if (type === "signup") {
           // SIGN UP WITH SUPABASE
-          const { error } = await supabase.auth.signUp({
+          const { data, error } = await supabase.auth.signUp({
             email: values.email,
             password: values.password,
             options: {
@@ -83,27 +86,26 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
 
           if (error) throw error;
 
-          const { data } = await supabase.auth.getUser();
-          const user = data?.user;
-
-          if (user?.id) await registerDevice(user.id);
+          setSession(data.session);
+          
+          const userId  = data.session?.user?.id;
+          if (userId) await registerDevice(userId);
           
           toast.success("Account created! Please check your email to verify.");
           form.reset();
          } else if (type === "login") {
           // LOGIN WITH SUPABASE
-          const { error } = await supabase.auth.signInWithPassword({
+          const { data, error } = await supabase.auth.signInWithPassword({
             email: values.email,
             password: values.password,
           });
 
           if (error) throw error;
 
+          setSession(data.session);
 
-          const { data } = await supabase.auth.getUser();
-          const user = data?.user;
-
-          if (user?.id) await registerDevice(user.id);
+          const userId = data.session?.user?.id;
+          if (userId) await registerDevice(userId);
 
           toast.success("Welcome back!");
           form.reset();
@@ -136,7 +138,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
       try {
         setGoogleLoading(true);
 
-        const { error } = await supabase.auth.signInWithOAuth({
+        const {  error } = await supabase.auth.signInWithOAuth({
           provider: "google",
           options: {
             redirectTo: `${window.location.origin}/dashboard`,
@@ -144,11 +146,6 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
         });
 
         if (error) throw error;
-
-        const { data } = await supabase.auth.getUser();
-        const user = data?.user;
-
-        if (user?.id) await registerDevice(user.id);
       } catch (error: any) {
         toast.error(error.message || "Google sign-in failed.");
       } finally {

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/supabase/prisma";
 
-
 export async function POST(request: Request) {
     try {
         const body = await request.json();
@@ -35,6 +34,13 @@ export async function POST(request: Request) {
                 ip
             }
         });
+
+        await prisma.device.deleteMany({
+            where: {
+                verificationCode: { not: null },
+                codeExpiresAt: { lt: new Date() },
+            }
+        })
 
         return NextResponse.json(newDevice, { status: 201 });
     } catch (error: any) {

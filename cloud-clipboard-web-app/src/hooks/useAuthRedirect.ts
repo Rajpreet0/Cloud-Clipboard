@@ -21,6 +21,7 @@ export function useAuthRedirect({ requireAuth = false, redirectTo = "/dashboard"
         if (requireAuth && !session) {
             router.replace("/auth/sign-in");
         } else if (!requireAuth && session) {
+
             router.replace(redirectTo);
         }
     }, [loading, session, router, requireAuth, redirectTo]);
