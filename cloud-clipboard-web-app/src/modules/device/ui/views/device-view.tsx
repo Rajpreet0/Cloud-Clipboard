@@ -22,12 +22,19 @@ const DeviceView = () => {
     const [currentDevice, setCurrentDevice] = useState<any>(null);
     const [loading, setLoading] = useState(true); 
     const session = useAuthStore((s) => s.session);
+    const authLoading = useAuthStore((s) => s.loading); 
 
     useEffect(() => {
         
         const loadDevices = async () => {
             try {
+
+                 if (authLoading) {
+                    return;
+                }
+
                 const userId = session?.user?.id;
+
 
                 if (!userId) {
                     console.error("No user found")
