@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import DeviceCard from "../components/DeviceCard";
 import { Spinner } from "@/components/ui/spinner";
 import { supabase } from "@/lib/supabase/client";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface Device {
     id: string;
@@ -25,15 +26,14 @@ const DeviceView = () => {
         
         const loadDevices = async () => {
             try {
-                const { data: userData, error: userError } = await supabase.auth.getUser();
-                
-                if (userError || !userData.user) {
+                const session = useAuthStore.getState().session;
+                const userId = session?.user?.id;
+
+                if (!userId) {
                     console.error("No user found")
                     setLoading(false);
                     return;
                 }
-
-                const userId = userData.user.id;
 
                 const res = await fetch(`/api/devices?userId=${userId}`);
                 const deviceData = await res.json();

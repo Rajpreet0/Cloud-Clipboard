@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {  Noto_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import RootClient from "./RootClient";
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -23,7 +24,7 @@ export default function RootLayout({
       <body
         className={`${notoSans.className} antialiased`}
       >
-        {children}
+        <RootClient>{children}</RootClient>
         <Toaster />
       </body>
     </html>

@@ -3,12 +3,14 @@
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { saveUserToDB } from "@/lib/saveUserToDB";
-import { useSupabaseSession } from "@/lib/supabase/session";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect, useState } from "react";
 
 
 const DashboardView = () => {
-    const {session, loading} = useSupabaseSession();
+    const session = useAuthStore((s) => s.session);
+    const loading = useAuthStore((s) => s.loading);
+    
     useAuthRedirect({ requireAuth: true });
     const [syncing, setSyncing] = useState(false);
     const [syncError, setSyncError] = useState<string | null>(null);
