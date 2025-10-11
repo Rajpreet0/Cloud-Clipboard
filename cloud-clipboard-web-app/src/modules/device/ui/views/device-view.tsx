@@ -5,6 +5,9 @@ import DeviceCard from "../components/DeviceCard";
 import { Spinner } from "@/components/ui/spinner";
 import { supabase } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/useAuthStore";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import DevicePairingModal from "../components/DevicePairingModal";
 
 interface Device {
     id: string;
@@ -23,6 +26,7 @@ const DeviceView = () => {
     const [loading, setLoading] = useState(true); 
     const session = useAuthStore((s) => s.session);
     const authLoading = useAuthStore((s) => s.loading); 
+    const [pairModalOpen, setPairModalOpen] = useState(false);
 
     useEffect(() => {
         
@@ -78,6 +82,12 @@ const DeviceView = () => {
 
   return (
     <div className="p-6 space-y-4 flex flex-col items-center justify-center gap-4">
+      <div className="mb-12">
+        <Button 
+            onClick={() => setPairModalOpen(true)}
+            className="bg-blue cursor-pointer hover:scale-105 transition-all"><Plus/>  Pair a new Device</Button>
+      </div>
+      <DevicePairingModal open={pairModalOpen} onClose={() => setPairModalOpen(false)}/>
       {devices.map((device) => (
         <DeviceCard
           key={device.id}

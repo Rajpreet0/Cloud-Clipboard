@@ -33,18 +33,24 @@ model User {
 }
 
 model Device {
-  id          String    @id @default(uuid())
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String 
-  fingerprint String
-  browser     String
-  os          String
-  deviceType  String
-  ip          String
-  isOnline    Boolean   @default(true)
-  lastSeenAt  DateTime  @default(now())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                  String    @id @default(uuid())
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              String 
+  deviceId            String    @unique @default(uuid())
+  name                String?
+  type                String?   // "web" | "dekstop" | "mobile"
+  verificationCode    String?
+  codeExpiresAt       DateTime?
+  authToken           String?
+  fingerprint         String
+  browser             String
+  os                  String
+  deviceType          String
+  ip                  String
+  isOnline            Boolean   @default(true)
+  lastSeenAt          DateTime  @default(now())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   clips Clip[]
 

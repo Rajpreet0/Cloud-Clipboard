@@ -1,6 +1,6 @@
 import TooltipAbstract from '@/components/tooltipAbstract';
 import { Card, CardContent } from '@/components/ui/card';
-import { LogOut } from 'lucide-react';
+import { LogOut, ShieldAlert } from 'lucide-react';
 import React from 'react';
 import Image from 'next/image';
 import { getBrowserIcon, getDeviceIcon, getOsIcon } from '@/lib/deviceIcons';
@@ -39,6 +39,12 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
     >
       <CardContent className="p-4 sm:p-6">
         {/* Main Flex Layout */}
+        {fingerprint === "PENDING" && (
+          <div className='flex items-center gap-2 w-fit border-2 border-amber-300 p-2 rounded-md mb-8 bg-amber-200/20'>
+            <ShieldAlert className='text-amber-400'/>
+            <p className='text-xs text-amber-400 font-bold'>Awaiting Pair Confirmation</p>
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row items-center sm:items-start sm:gap-4 text-center sm:text-left">
           {/* Icon */}
           <div className="flex justify-center sm:justify-start mb-3 sm:mb-0 sm:w-[20%]">
@@ -60,7 +66,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
                 {browser || "Unbekannter Browser"}
               </p>
               <p className="text-gray-400 text-xs sm:text-sm">
-                Last Seen At: {lastSeenAt || "N/A"}
+                Last Login At: {lastSeenAt || "N/A"}
               </p>
             </div>
 
