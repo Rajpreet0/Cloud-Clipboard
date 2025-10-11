@@ -50,7 +50,7 @@ const DeviceView = () => {
         };
 
         loadDevices();
-    }, []);
+    }, [session]);
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-screen gap-4">
