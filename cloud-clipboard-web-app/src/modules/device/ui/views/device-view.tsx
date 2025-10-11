@@ -21,12 +21,12 @@ const DeviceView = () => {
     const [devices, setDevices] = useState<Device[]>([]);
     const [currentDevice, setCurrentDevice] = useState<any>(null);
     const [loading, setLoading] = useState(true); 
+    const session = useAuthStore((s) => s.session);
 
     useEffect(() => {
         
         const loadDevices = async () => {
             try {
-                const session = useAuthStore.getState().session;
                 const userId = session?.user?.id;
 
                 if (!userId) {
