@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getDisplayName } from "@/lib/getDisplayName";
 import { supabase } from "@/lib/supabase/client";
-import { useSupabaseSession } from "@/lib/supabase/session";
+import { useAuthStore } from "@/store/useAuthStore";
 import { ChevronDownIcon, LogOutIcon, Settings } from "lucide-react";
 import { useRouter } from "next/navigation"
 
@@ -16,7 +16,7 @@ const DashboardUserButton = () => {
 
     const router = useRouter();
     const isMobile = useIsMobile();
-    const {session} = useSupabaseSession();
+    const session = useAuthStore((s) => s.session);
 
     if (!session?.user) {
         return null;

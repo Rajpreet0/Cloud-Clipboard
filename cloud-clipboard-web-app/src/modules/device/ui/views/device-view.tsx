@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import DeviceCard from "../components/DeviceCard";
 import { Spinner } from "@/components/ui/spinner";
 import { supabase } from "@/lib/supabase/client";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface Device {
     id: string;
@@ -20,20 +21,26 @@ const DeviceView = () => {
     const [devices, setDevices] = useState<Device[]>([]);
     const [currentDevice, setCurrentDevice] = useState<any>(null);
     const [loading, setLoading] = useState(true); 
+    const session = useAuthStore((s) => s.session);
+    const authLoading = useAuthStore((s) => s.loading); 
 
     useEffect(() => {
         
         const loadDevices = async () => {
             try {
-                const { data: userData, error: userError } = await supabase.auth.getUser();
-                
-                if (userError || !userData.user) {
+
+                 if (authLoading) {
+                    return;
+                }
+
+                const userId = session?.user?.id;
+
+
+                if (!userId) {
                     console.error("No user found")
                     setLoading(false);
                     return;
                 }
-
-                const userId = userData.user.id;
 
                 const res = await fetch(`/api/devices?userId=${userId}`);
                 const deviceData = await res.json();
@@ -50,7 +57,7 @@ const DeviceView = () => {
         };
 
         loadDevices();
-    }, []);
+    }, [session]);
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-screen gap-4">

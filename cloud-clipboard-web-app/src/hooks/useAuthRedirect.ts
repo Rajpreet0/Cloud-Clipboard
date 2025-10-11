@@ -1,4 +1,4 @@
-import { useSupabaseSession } from "@/lib/supabase/session";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -11,7 +11,9 @@ interface UseAuthRedirectOptions{
 export function useAuthRedirect({ requireAuth = false, redirectTo = "/dashboard" }: UseAuthRedirectOptions) {
    
     const router = useRouter();
-    const { session, loading } = useSupabaseSession();
+
+    const session = useAuthStore((s) => s.session);
+    const loading = useAuthStore((s) => s.loading);
 
     useEffect(() => {
         if (loading) return;
