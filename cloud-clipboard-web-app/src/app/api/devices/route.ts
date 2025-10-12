@@ -1,20 +1,33 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/supabase/prisma";
 
+
+/**
+ ** Handles POST requests to register or update a user's device in the database.
+ *
+ * - If a device with the same `fingerprint` and `userId` exists → updates `lastSeenAt` and `ip`.
+ * - Otherwise creates a new device record with browser, OS, and device details.
+ * - Automatically cleans up expired verification codes after each call.
+ *
+ * @param {Request} request - Incoming HTTP request with device info in JSON format.
+ * @returns {Promise<NextResponse>} JSON response with the created or updated device entry.
+ */
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { userId, fingerprint, browser, os, device, ip } = body;
 
+        // Validate required fields
         if (!fingerprint) {
             return NextResponse.json({ error: "Missing fingerprint" }, { status: 400 });
         }
 
-        // Update lastSeenAt if device already exists
+        // Check if the device already exists
         const existing = await prisma.device.findFirst({
             where: { fingerprint, userId }
         });
 
+        // Update `lastSeenAt` if device is already registered
         if (existing) {
             const updated = await prisma.device.update({
                 where: { id: existing.id },
@@ -23,7 +36,7 @@ export async function POST(request: Request) {
             return NextResponse.json(updated, { status: 200 });
         }
 
-        // Otherwise create a new entry
+        // Otherwise, create a new device record
         const newDevice = await prisma.device.create({
             data: {
                 userId,
@@ -35,6 +48,7 @@ export async function POST(request: Request) {
             }
         });
 
+        // Cleanup expired verification codes
         await prisma.device.deleteMany({
             where: {
                 verificationCode: { not: null },
@@ -49,6 +63,15 @@ export async function POST(request: Request) {
     }
 }
 
+/**
+ ** Handles GET requests to retrieve all devices for a given user.
+ *
+ * - Expects a `userId` query parameter.
+ * - Returns devices ordered by their last activity date (`lastSeenAt` descending).
+ *
+ * @param {Request} req - HTTP request containing `userId` in query params.
+ * @returns {Promise<NextResponse>} JSON response with the user's device list.
+ */
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
@@ -71,6 +94,15 @@ export async function GET(req: Request) {
     }
 }
 
+/**
+ ** Handles DELETE requests to remove a device by its ID.
+ *
+ * - Expects an `id` query parameter representing the device ID.
+ * - Deletes the device entry from the database.
+ *
+ * @param {Request} req - HTTP request containing the `id` query param.
+ * @returns {Promise<NextResponse>} JSON response confirming deletion.
+ */
 export async function DELETE(req: Request) {
     try {
         const { searchParams } = new URL(req.url);

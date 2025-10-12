@@ -1,5 +1,17 @@
 import {z} from "zod";
 
+/**
+ * Zod validation schema for resetting a user's password.
+ *
+ * - Enforces strong password policy (uppercase, lowercase, number, special character).
+ * - Ensures the confirmation password matches the new password.
+ *
+ * @example
+ * resetPasswordSchema.parse({
+ *   password: "SecureP@ss1",
+ *   confirmPassword: "SecureP@ss1"
+ * });
+ */
 export const resetPasswordSchema = z.object({
     password: z
         .string()

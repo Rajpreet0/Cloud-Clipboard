@@ -13,6 +13,18 @@ interface DevicePairingModalProps {
     onClose: () => void;
 }
 
+/**
+ ** Modal component for generating and displaying a temporary device pairing code.
+ *
+ * - Allows users to link new devices to their account (desktop or mobile).
+ * - Requests a pairing code from the `/api/devices/pair` endpoint.
+ * - Displays both a text-based code and a QR code for convenience.
+ * - Includes a live countdown timer until code expiration.
+ * - Handles regeneration of expired codes with a "Refresh Code" button.
+ *
+ * @param {DevicePairingModalProps} props - Component props: `open` (boolean) and `onClose` (function).
+ * @returns {JSX.Element} The rendered modal with pairing code and QR display.
+ */
 const DevicePairingModal: React.FC<DevicePairingModalProps> = ({ open, onClose }) => {
 
   const { session } = useAuthStore();
@@ -21,7 +33,10 @@ const DevicePairingModal: React.FC<DevicePairingModalProps> = ({ open, onClose }
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
 
-  // Generate new pairing code
+   /**
+   * Requests a new pairing code from the API.
+   * Stores the code, expiration timestamp, and initializes countdown.
+   */
   const generatePairCode = async () => {
     if (!session?.user) return toast.error("Not authenticated");
 
@@ -49,6 +64,9 @@ const DevicePairingModal: React.FC<DevicePairingModalProps> = ({ open, onClose }
     }
   }
 
+  /**
+   * Live countdown timer that updates every second until expiration.
+   */
   useEffect(() => {
     if (!expiresAt) return;
     const interval = setInterval(() => {
@@ -59,6 +77,9 @@ const DevicePairingModal: React.FC<DevicePairingModalProps> = ({ open, onClose }
     return () => clearInterval(interval);
   }, [expiresAt]);
 
+  /**
+   * Reset state when modal is closed.
+   */
   useEffect(() => {
     if (!open) {
         setPairCode(null);
@@ -74,6 +95,7 @@ const DevicePairingModal: React.FC<DevicePairingModalProps> = ({ open, onClose }
                 <DialogTitle className="text-xl font-semibold text-center">Pair a new Device</DialogTitle>
             </DialogHeader>
 
+            {/* Show button or loading state before code generation */}
             {!pairCode ? (
                 <div className="flex flex-col items-center justify-center space-y-4">
                     {loading ? (
@@ -88,6 +110,7 @@ const DevicePairingModal: React.FC<DevicePairingModalProps> = ({ open, onClose }
                     )}
                 </div>
             ) : (
+                // Show generated code and QR
                 <div className="flex flex-col items-center space-y-6">
                     <div className="text-center">
                         <p className="text-gray-500 mb-2">Enter this code in your Desktop or Mobile App</p>
@@ -105,6 +128,7 @@ const DevicePairingModal: React.FC<DevicePairingModalProps> = ({ open, onClose }
                         </span>
                     </p>
 
+                    {/* Refresh button for expired codes */}    
                     {countdown <= 0 && (
                         <Button variant="outline" onClick={generatePairCode}>
                             Refresh Code

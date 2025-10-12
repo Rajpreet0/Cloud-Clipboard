@@ -1,6 +1,21 @@
 import {z} from "zod";
 
-
+/**
+ ** Zod validation schema for user sign-up form.
+ *
+ * - Validates username (length, allowed characters).
+ * - Ensures email format correctness.
+ * - Enforces strong password rules (uppercase, lowercase, number, special character).
+ * - Confirms that password and confirmPassword fields match.
+ *
+ * @example
+ * signUpSchema.parse({
+ *   username: "John_Doe",
+ *   email: "john@example.com",
+ *   password: "StrongP@ss1",
+ *   confirmPassword: "StrongP@ss1"
+ * });
+ */
 export const signUpSchema = z.object({
   username: z
     .string()
