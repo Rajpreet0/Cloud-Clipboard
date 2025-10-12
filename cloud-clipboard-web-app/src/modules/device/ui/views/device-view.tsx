@@ -3,7 +3,6 @@ import { getDeviceInfo } from "@/lib/getDeviceInfo";
 import { useEffect, useState } from "react";
 import DeviceCard from "../components/DeviceCard";
 import { Spinner } from "@/components/ui/spinner";
-import { supabase } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -19,6 +18,18 @@ interface Device {
     lastSeenAt: string;
 }
 
+/**
+ * DeviceView component
+ *
+ ** Displays a list of all registered devices for the currently authenticated user.
+ *
+ * - Fetches user devices from `/api/devices` based on Supabase user ID.
+ * - Detects the current device using `getDeviceInfo()`.
+ * - Highlights the active device and allows pairing new ones via modal.
+ * - Handles loading states and empty lists gracefully.
+ *
+ * @returns {JSX.Element} The rendered device management view.
+ */
 const DeviceView = () => {
 
     const [devices, setDevices] = useState<Device[]>([]);
@@ -33,12 +44,12 @@ const DeviceView = () => {
         const loadDevices = async () => {
             try {
 
-                 if (authLoading) {
+                // Wait until authentication state is resolved
+                if (authLoading) {
                     return;
                 }
 
                 const userId = session?.user?.id;
-
 
                 if (!userId) {
                     console.error("No user found")
@@ -46,9 +57,11 @@ const DeviceView = () => {
                     return;
                 }
 
+                // Fetch registered devices for current user
                 const res = await fetch(`/api/devices?userId=${userId}`);
                 const deviceData = await res.json();
 
+                // Get info about the current browser/device
                 const info = await getDeviceInfo();
 
                 setDevices(deviceData);
@@ -63,6 +76,7 @@ const DeviceView = () => {
         loadDevices();
     }, [session]);
 
+    // Show spinner while loading
     if (loading) return (
         <div className="flex items-center justify-center min-h-screen gap-4">
             <Spinner/>
@@ -72,6 +86,7 @@ const DeviceView = () => {
         </div>
     ) 
 
+    // Handle case: no devices found
     if (!devices || devices.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen">
@@ -82,12 +97,18 @@ const DeviceView = () => {
 
   return (
     <div className="p-6 space-y-4 flex flex-col items-center justify-center gap-4">
+      
+      {/* Device pairing modal trigger */}
       <div className="mb-12">
         <Button 
             onClick={() => setPairModalOpen(true)}
             className="bg-blue cursor-pointer hover:scale-105 transition-all"><Plus/>  Pair a new Device</Button>
       </div>
+      
+      {/* Pairing modal */}
       <DevicePairingModal open={pairModalOpen} onClose={() => setPairModalOpen(false)}/>
+    
+      {/* List of registered devices */}
       {devices.map((device) => (
         <DeviceCard
           key={device.id}

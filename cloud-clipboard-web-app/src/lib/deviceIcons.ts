@@ -11,6 +11,12 @@ import { VscServerProcess } from "react-icons/vsc";
 import { CiMobile1 } from "react-icons/ci";
 import { FaDesktop } from "react-icons/fa";
 
+/**
+ ** Returns the corresponing browser icon based on browser name.
+ * 
+ * @param {string | undefined} browser - Browser name (e.g "Chrome", "Safari").
+ * @returns {StaticImageData} The matching browser icon.
+ */
 export const getBrowserIcon = (browser: string | undefined) => {
     if (!browser) return DefaultBrowserIcon;
 
@@ -24,6 +30,12 @@ export const getBrowserIcon = (browser: string | undefined) => {
     return DefaultBrowserIcon;
 }
 
+/**
+ ** Returns the corresponding OS icon based on OS name.
+ * 
+ * @param {string | undefined} os - Operating system name (e.g "Window", "Linux"). 
+ * @returns {React.ElementType} A React icon component for the OS.
+ */
 export const getOsIcon = (os: string | undefined) => {
     if (!os) return VscServerProcess;
     const name = os.toLowerCase();
@@ -36,6 +48,12 @@ export const getOsIcon = (os: string | undefined) => {
     return VscServerProcess;
 }
 
+/**
+ ** Returns the appropriate device icon (desktop or mobile)
+ * 
+ * @param {string | undefined} device - Device type (e.g. "desktop", "mobile").
+ * @returns {React.ElementType} A React icon component for the device.
+ */
 export const getDeviceIcon = (device: string | undefined) => {
     if (!device) return FaDesktop;
 

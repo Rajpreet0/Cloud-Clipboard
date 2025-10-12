@@ -1,16 +1,29 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/supabase/prisma";
 
+/**
+ ** Handles POST request to create or fetch a user in the database
+ * 
+ * - Validates the incoming request body for required fields (`id`, `email`).
+ * - Checks if a user already exists in the database
+ * - If the user exists → returns it with status 200
+ * - If not → creates a new user record and returns it with satus  201
+ * - Handles unexpected errors with a 500 response.
+ * 
+ * @param {Request} request - Incoming HTTP request containing user data in JSON format.
+ * @returns {Promise<NextResponse>} JSON response with existing or newly created user.
+ */
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { id, email, fullName, avatarUrl } = body;
 
+        // Validate required fields
         if (!id || !email) {
             return NextResponse.json({ error: "Missing fields" }, {status: 400});
         }
 
-        // Check if the User existed
+        // Check if the user already exists in the database
         const existingUser = await prisma.user.findUnique({
             where: {id},
         });
@@ -23,7 +36,7 @@ export async function POST(request: Request) {
             });
         }
 
-        // If User not existed then create a new User
+        // Create new user if not found
         const newUser = await prisma.user.create({
             data: {
                 id,

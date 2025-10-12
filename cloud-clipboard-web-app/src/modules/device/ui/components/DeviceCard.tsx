@@ -15,6 +15,17 @@ interface DeviceCardProps {
   lastSeenAt?: string;
 }
 
+/**
+ ** Displays information about a registered user device in a styled card.
+ *
+ * - Shows browser, OS, device type, IP address, and fingerprint.
+ * - Highlights the card with green if the device is currently online, red if offline.
+ * - Displays warning banner for pending device pairings (fingerprint = "PENDING").
+ * - Includes interactive tooltips for OS, device, and logout actions.
+ *
+ * @param {DeviceCardProps} props - Device information and UI state.
+ * @returns {JSX.Element} A styled card with detailed device information.
+ */
 const DeviceCard: React.FC<DeviceCardProps> = ({
   browser,
   os,
@@ -38,15 +49,16 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
       } border rounded-2xl`}
     >
       <CardContent className="p-4 sm:p-6">
-        {/* Main Flex Layout */}
+        {/* Pending pairing alert */}
         {fingerprint === "PENDING" && (
           <div className='flex items-center gap-2 w-fit border-2 border-amber-300 p-2 rounded-md mb-8 bg-amber-200/20'>
             <ShieldAlert className='text-amber-400'/>
             <p className='text-xs text-amber-400 font-bold'>Awaiting Pair Confirmation</p>
           </div>
         )}
+        {/* Main layout */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start sm:gap-4 text-center sm:text-left">
-          {/* Icon */}
+          {/* Browser Icon */}
           <div className="flex justify-center sm:justify-start mb-3 sm:mb-0 sm:w-[20%]">
             <Image
               src={browserIcon}
@@ -59,7 +71,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
             />
           </div>
 
-          {/* Text Content */}
+          {/* Text + Icons */}
           <div className="flex flex-col w-full gap-2 sm:gap-3">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
               <p className="font-semibold text-lg sm:text-xl tracking-wide">
@@ -70,6 +82,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
               </p>
             </div>
 
+            {/* IP Address */}
             <a
               href={`https://tools.keycdn.com/geo?host=${ip}`}
               target="_blank"
@@ -82,6 +95,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
               </span>
             </a>
 
+            {/* Fingerprint + Icons */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
               <p className="text-gray-400 text-xs sm:text-sm truncate">
                 D-Fingerprint: {fingerprint}

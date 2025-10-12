@@ -22,8 +22,17 @@ interface AuthFormProps {
   type: AuthFormType;
 }
 
-/*
- *  Abstract Auth Form for Login and SignUp
+/**
+ ** Unified authentication form handling sign-up, login, password reset, and forgot password flows.
+ *
+ * - Uses `react-hook-form` with Zod validation schemas for each form type.
+ * - Integrates Supabase Auth for all authentication actions.
+ * - On success, stores the session in Zustand (`useAuthStore`) and registers the device.
+ * - Provides Google OAuth sign-in via Supabase.
+ * - Displays contextual UI states (loading, success, errors).
+ *
+ * @param {AuthFormProps} props - Determines form behavior based on type (`signup`, `login`, `forgotPassword`, `resetPassword`).
+ * @returns {JSX.Element} Auth form for the chosen authentication flow.
  */
 const AuthForm: React.FC<AuthFormProps> = ({type}) => {
     const router = useRouter();
@@ -32,6 +41,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
 
     const { setSession } = useAuthStore.getState();
  
+    // Dynamically assign validation schema & default values based on form type
     let schema;
     let defaultValues: any;
 
@@ -67,6 +77,10 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
         defaultValues,
     });
 
+    
+    /**
+     * Handles all authentication flows based on form type.
+     */
     const onSubmit = async (values: any) => {
        setLoading(true);
 
@@ -94,7 +108,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           toast.success("Account created! Please check your email to verify.");
           form.reset();
          } else if (type === "login") {
-          // LOGIN WITH SUPABASE
+          // SIGN IN WITH SUPABASE
           const { data, error } = await supabase.auth.signInWithPassword({
             email: values.email,
             password: values.password,
@@ -111,6 +125,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           form.reset();
           router.push("/dashboard");
         } else if (type === "forgotPassword") {
+          // TRIGGER PASSWORD RESET EMAIL
           const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
             redirectTo: `${window.location.origin}/auth/reset-password`,
           });
@@ -119,6 +134,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           toast.success("Password reset link sent! Please check your email.");
           form.reset();
         } else if (type === "resetPassword") {
+          // UPDATE PASSWORD AFTER RESET
           const { error } = await supabase.auth.updateUser({
             password: values.password,
           });
@@ -134,6 +150,10 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
        }
     }
 
+      
+    /**
+     * Handles Google OAuth authentication via Supabase.
+     */
     const handleGoogleAuth = async () => {
       try {
         setGoogleLoading(true);
@@ -156,6 +176,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        {/* Username field (Sign Up only) */}
         {type === "signup" && (
           <FormField
             control={form.control}
@@ -172,6 +193,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           />
         )}
 
+        {/* Email field (excluded in reset password form) */}
         {type !== "resetPassword" && (
           <FormField
             control={form.control}
@@ -188,6 +210,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           />
         )}
 
+        {/* Password fields */}
         {type !== "forgotPassword" && type !== "resetPassword" && (
           <FormField
             control={form.control}
@@ -203,7 +226,8 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
             )}
           />
         )}
-
+        
+        {/* Confirm password (Sign Up + Reset Password) */}
         {type === "signup" && (
           <FormField
             control={form.control}
@@ -252,7 +276,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
         )}
 
 
-
+        {/* Submit button */}
         <Button type="submit" className="w-full bg-gray-900 text-white cursor-pointer hover:bg-gray-800 transition">
           {loading 
             ? 
@@ -269,6 +293,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
             : "Update Password"}
         </Button>
 
+        {/* Google Auth (not shown for forgot/reset password) */}
         {type !== "forgotPassword" && type !== "resetPassword" && (
           <Button
             type="button"
@@ -289,6 +314,7 @@ const AuthForm: React.FC<AuthFormProps> = ({type}) => {
           </Button>
         )}
 
+        {/* Forgot password link */}
         {type !== "resetPassword" && (
           <p className="text-sm text-black/50 hover:underline cursor-pointer text-center"
             onClick={() => {
