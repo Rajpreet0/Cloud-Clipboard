@@ -6,7 +6,7 @@ const Home = () => {
     const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center  w-full ">
+    <div className="flex flex-col items-center justify-center w-full ">
       {/* Logo */}
       <div className="flex flex-col items-center mb-8">
         <img
@@ -19,21 +19,29 @@ const Home = () => {
         </h1>
       </div>
 
+      {/* Welcome Message with Description */}
+      <div className="flex flex-col items-center mb-8 mt-10">
+        <h3 className="text-2xl font-semibold">Welcome 👋</h3>
+        <p className="text-lg max-w-2xl mt-4 text-gray-600">Cloud Clipboard let's you copy and paste across all your devices
+          instantly, securlely and effortlessly. <span className="font-bold">One Account. One Clipboard.</span> Anywhere you go.
+        </p>
+      </div>
+
       {/* Pair Device Button */}
       <Button
         onClick={() => navigate("/pair")}
-        className="px-6 py-3 mt-12 rounded-xl text-blackfont-medium !bg-blue-600 text-white  transition"
+        className="w-[200px] h-[35px] mt-12 rounded-lg text-lg bg-blue text-white hover:scale-105 hover:shadow-lg transition-all cursor-pointer"
       >
         Pair Device
       </Button>
 
       {/* Footer Text */}
       <p className="mt-24 text-gray-600 text-sm">
-        No account?{" "}
+        No account? Please Sign Up First{" "}<br/>
         <a
           href="https://localhost:3000/auth/signup"
           target="_blank"
-          className="text-blue-600 hover:underline"
+          className="font-semibold text-blue hover:underline mt-2"
         >
           Sign Up
         </a>

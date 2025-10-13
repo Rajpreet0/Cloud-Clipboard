@@ -1,28 +1,32 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 
 const PairDevice = () => {
   return (
-    <div className="flex flex-col items-center justify-center  bg-white">
-      <h1 className="text-2xl font-bold mb-4">Pair your Device</h1>
-      <p className="text-gray-600 mb-6 text-center max-w-sm">
+    <div className="flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold mb-4">Pair your Device</h1>
+      <p className="text-gray-600 mb-6 text-center max-w-md">
         Enter the pairing code displayed in your web dashboard to connect this device
         with your Cloud Clipboard account.
       </p>
 
-      <input
+      <Input
         type="text"
         placeholder="Enter pairing code"
-        className="border border-gray-300 rounded-lg px-4 py-2 w-64 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+        maxLength={9}
+        className="mt-12 rounded-lg px-4 py-2 w-[300px] h-[40px] font-bold !text-lg text-center text-blue border-2 border-gray-300 focus:border-blue uppercase 
+        tracking-widest placeholder:tracking-normal placeholder:normal-case placeholder:font-normal placeholder:!text-sm"
       />
 
+      {/* Pair Device Button */}
       <Button
-        className="mt-4 px-6 py-2 !bg-blue-600 text-white rounded-lg !hover:bg-blue-700 transition"
+        className="w-[150px] h-[35px] mt-12 rounded-lg text-lg bg-blue text-white hover:scale-105 hover:shadow-lg transition-all cursor-pointer"
       >
-        Pair
+        Pair 
       </Button>
 
-      <Link to="/" className="mt-8 text-blue-500 hover:underline">
+      <Link to="/" className="mt-12 !text-blue hover:underline">
         ← Back to Home
       </Link>
     </div>
