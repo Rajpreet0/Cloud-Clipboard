@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import PairDevice from "./pages/PairDevice";
 import './App.css'
 import Dashboard from "./pages/Dashboard";
+import Team from "./pages/Team";
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<Home/>}/>
         <Route path="/pair" element={<PairDevice/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/users" element={<Team/>}/>
       </Routes>
     </Router>
   )
