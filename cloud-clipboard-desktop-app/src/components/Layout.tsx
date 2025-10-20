@@ -6,9 +6,11 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({children}) => {
   return (
-    <div className="flex h-screen w-[100vw]">
-      <SideMenuBar/>
-      <main className="p-4">
+    <div className="flex h-screen bg-[#F8FAFC]/20">
+      <div className="fixed left-0 top-0 h-screen w-[80px] ">
+        <SideMenuBar/>
+      </div>
+      <main className="ml-[80px] flex-1 overflow-y-auto p-8">
         {children}
       </main>
     </div>

@@ -22,7 +22,7 @@ const Home = () => {
       {/* Welcome Message with Description */}
       <div className="flex flex-col items-center mb-8 mt-10">
         <h3 className="text-2xl font-semibold">Welcome 👋</h3>
-        <p className="text-lg max-w-2xl mt-4 text-gray-600">Cloud Clipboard let's you copy and paste across all your devices
+        <p className="text-lg text-center max-w-2xl mt-4 text-gray-600">Cloud Clipboard let's you copy and paste across all your devices
           instantly, securlely and effortlessly. <span className="font-bold">One Account. One Clipboard.</span> Anywhere you go.
         </p>
       </div>
@@ -36,7 +36,7 @@ const Home = () => {
       </Button>
 
       {/* Footer Text */}
-      <p className="mt-24 text-gray-600 text-sm">
+      <p className="mt-24 text-gray-600 text-sm text-center">
         No account? Please Sign Up First{" "}<br/>
         <a
           href="https://localhost:3000/auth/signup"

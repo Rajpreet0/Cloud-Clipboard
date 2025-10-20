@@ -13,6 +13,7 @@ interface DeviceCardProps {
   fingerprint: string;
   isOnline: boolean;
   lastSeenAt?: string;
+  onLogout?: () => void;
 }
 
 /**
@@ -33,7 +34,8 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   ip,
   fingerprint,
   isOnline,
-  lastSeenAt
+  lastSeenAt,
+  onLogout
 }) => {
 
     const browserIcon = getBrowserIcon(browser);
@@ -120,6 +122,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
                 <TooltipAbstract content="Logout the Device">
                   <LogOut
                     size={18}
+                    onClick={onLogout}
                     className="text-red-700 cursor-pointer hover:text-red-800"
                   />
                 </TooltipAbstract>
