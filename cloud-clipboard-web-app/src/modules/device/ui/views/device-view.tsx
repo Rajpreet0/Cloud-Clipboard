@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import DevicePairingModal from "../components/DevicePairingModal";
+import { toast } from "sonner";
 
 interface Device {
     id: string;
@@ -76,6 +77,23 @@ const DeviceView = () => {
         loadDevices();
     }, [session]);
 
+    async function handleDeviceLogout(deviceId: string) {
+        try {
+            const res = await fetch(`/api/devices?id=${deviceId}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok)  throw new Error("Failed to delete device.");
+
+            toast.success("Device deleted successfully.");
+            setDevices(prev => prev.filter(d => d.id !== deviceId));
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Device deletion failed.")
+        }
+    }
+
     // Show spinner while loading
     if (loading) return (
         <div className="flex items-center justify-center min-h-screen gap-4">
@@ -96,7 +114,7 @@ const DeviceView = () => {
     }
 
   return (
-    <div className="p-6 space-y-4 flex flex-col items-center justify-center gap-4">
+    <div className="p-6 space-y-4 flex flex-col items-center justify-center gap-4 bg-muted">
       
       {/* Device pairing modal trigger */}
       <div className="mb-12">
@@ -119,6 +137,7 @@ const DeviceView = () => {
           fingerprint={device.fingerprint}
           lastSeenAt={new Date(device.lastSeenAt).toLocaleString()}
           isOnline={currentDevice?.fingerprint === device.fingerprint}
+          onLogout={() => handleDeviceLogout(device.id)}
         />
       ))}
     </div>

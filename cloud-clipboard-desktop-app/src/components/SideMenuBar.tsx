@@ -13,7 +13,7 @@ const SideMenuBar = () => {
     const isActive = (path: string) => currentPath === path;
 
   return (
-      <div className="flex flex-col items-center w-[80px] p-4 bg-white-gray h-full">
+      <div className="flex flex-col items-center w-[80px] p-4 bg-white-gray drop-shadow-x h-full">
         <img
             src={Logo}
             alt="Cloud Clipboard Logo"
@@ -31,7 +31,9 @@ const SideMenuBar = () => {
                     className={`cursor-pointer ${isActive("/users") ? "text-white" : "text-blue"}`} size={28}/>
             </div>
         </div>
-        <Settings className="mb-2 cursor-pointer" size={28} />
+        <Settings 
+            onClick={() => navigate("/settings")}
+            className="mb-2 cursor-pointer text-dark-gray" size={28} />
       </div>
   )
 }

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -8,6 +9,7 @@ const PairDevice = () => {
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const { setAuth } = useAuth();
   const navigate = useNavigate();
 
   async function handlePair() {
@@ -39,6 +41,8 @@ const PairDevice = () => {
         deviceId: data.deviceId,
       });
 
+      setAuth({ authToken: data.authToken, deviceId: data.deviceId });
+
       setStatus("success");
       setMessage("Device paired successfully!");
 
@@ -50,7 +54,7 @@ const PairDevice = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center h-screen">
       <h1 className="text-4xl font-bold mb-4">Pair your Device</h1>
       <p className="text-gray-600 mb-6 text-center max-w-md">
         Enter the pairing code displayed in your web dashboard to connect this device
@@ -60,7 +64,7 @@ const PairDevice = () => {
       <Input
         type="text"
         placeholder="Enter pairing code"
-        maxLength={9}
+        maxLength={8}
         value={code}
         onChange={(e) => setCode(e.target.value.toUpperCase())}
         className="mt-12 rounded-lg px-4 py-2 w-[300px] h-[40px] font-bold !text-lg text-center text-blue border-2 border-gray-300 focus:border-blue uppercase 
