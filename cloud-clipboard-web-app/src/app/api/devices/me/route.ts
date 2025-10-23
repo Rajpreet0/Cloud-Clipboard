@@ -63,7 +63,7 @@ export async function POST(req: Request) {
             valid: true,
             user: device.user,
             device: {
-                deviceId: device.deviceId,
+                deviceid: device.deviceId,
                 lastSeenAt: device.lastSeenAt,
             }
         }), { status: 200, headers: resHeaders });

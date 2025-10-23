@@ -10,59 +10,38 @@ const Settings = () => {
   return (
     <Layout>
         <h2 className="text-3xl text-left font-bold tracking-wide text-gray-700">Settings</h2>
-        <div className="flex flex-col mt-4 p-4 w-full gap-10">
-            {/*TODO: Hardcoded email should be available */}
+        <div className="flex flex-col mt-4 p-4 w-full gap-10"> 
             <div>
               <h2 className="font-semibold text-lg text-gray-600">Account</h2>
-              <SettingsItem
-                itemTitle={auth?.user.email ?? "Loading..."}
-                children={
-                  <>
-                    <Button onClick={logout} className="text-white cursor-pointer bg-red-700">Logout</Button>
-                  </>
-                }
-              />
+              <SettingsItem itemTitle={auth?.user.email ?? "Loading..."}>
+                <Button onClick={logout} className="text-white cursor-pointer bg-red-700">Logout</Button>
+              </SettingsItem>
             </div>
             <div>
                 <h2 className="font-semibold text-lg text-gray-600">Cloud Sync</h2>
-                <SettingsItem
-                  itemTitle="Synchronization"
-                  children={
+                <SettingsItem itemTitle="Synchronization">
                     <>
-                    
                     </>
-                  }/>
-                <SettingsItem
-                  itemTitle="Sync Frequency"
-                  children={
+                </SettingsItem>
+                <SettingsItem itemTitle="Sync Frequency">
                     <>
-                    
                     </>
-                }/>
+                </SettingsItem>
             </div>
             <div>
                 <h2 className="font-semibold text-lg text-gray-600">Shortcuts</h2>
-                <SettingsItem
-                  itemTitle="Open Clipboard Overlay"
-                  children={
+                <SettingsItem itemTitle="Open Clipboard Overlay">
                     <>
-                    
                     </>
-                  }/>
-                <SettingsItem
-                  itemTitle="Copy Last Clip"
-                  children={
+                </SettingsItem>
+                <SettingsItem itemTitle="Copy Last Clip">
                     <>
-                    
                     </>
-                }/>
-                <SettingsItem
-                  itemTitle="Pause Sync"
-                  children={
+                </SettingsItem>
+                <SettingsItem itemTitle="Pause Sync">
                     <>
-                    
                     </>
-                }/>
+                </SettingsItem>                
             </div>
             <div>
                 <h2 className="font-semibold text-lg text-gray-600">About</h2>
