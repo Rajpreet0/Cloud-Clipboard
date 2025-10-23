@@ -66,6 +66,31 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         initAuth();
     }, []); 
 
+    useEffect(() => {
+        if (!auth?.authToken) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch("http://localhost:3000/api/devices/ping", {
+                    method: "PATCH",
+                    headers: {
+                        Authorization: `Bearer ${auth.authToken}`
+                    },
+                });
+
+                if (!res.ok) {
+                    await window.secureStore.clearAuth();
+                    setAuth(null);
+                    navigate("/");
+                }
+            } catch (err) {
+                console.warn("[PING FAILED]", err);
+            }
+        }, 600_000);
+
+        return () => clearInterval(interval);
+    }, [auth?.authToken]);
+
     async function logout() {
         await window.secureStore.clearAuth();
         setAuth(null);
