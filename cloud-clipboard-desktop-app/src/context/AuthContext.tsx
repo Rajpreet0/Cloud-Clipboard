@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom";
 
 type AuthInfo = {
     authToken: string;
-    deviceId: string
+    deviceId: string;
+    user: {
+        id: string;
+        email: string;
+        name?: string | null;
+    }
 } | null;
 
 const AuthContext = createContext<{
@@ -30,9 +35,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
                     return;
                 }
 
-                setAuth(tokenObj);
-
-                const res = await fetch("http://localhost:3000/api/devices/validate", {
+                const res = await fetch("http://localhost:3000/api/devices/me", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ authToken: tokenObj.authToken }),
@@ -43,6 +46,12 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
                 if (!data.valid) {
                     await window.secureStore.clearAuth();
                     setAuth(null);
+                } else {
+                    setAuth({
+                        authToken: tokenObj.authToken,
+                        deviceId: data.device.deviceid,
+                        user: data.user,
+                    })
                 }
                 
             } catch (err) {

@@ -41,7 +41,18 @@ const PairDevice = () => {
         deviceId: data.deviceId,
       });
 
-      setAuth({ authToken: data.authToken, deviceId: data.deviceId });
+      const meRes = await fetch("http://localhost:3000/api/devices/me", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authToken: data.authToken }),
+      });
+      const meData = await meRes.json();
+
+      setAuth({ 
+        authToken: data.authToken, 
+        deviceId: data.deviceId, 
+        user: meData.user 
+      });
 
       setStatus("success");
       setMessage("Device paired successfully!");
