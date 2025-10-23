@@ -92,7 +92,14 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
                     failureCountRef.current = 0;
                 }
             } catch (err) {
-                console.warn("[PING FAILED]", err);
+                console.warn("[PING FAILED]", err);+
+                failureCountRef.current++;
+                if (failureCountRef.current >= 3) {
+                    await window.secureStore.clearAuth();
+                    setAuth(null);
+                    navigate("/");
+                    failureCountRef.current = 0;
+                }
             }
         }, 300_000); // 5 Minutes
 
