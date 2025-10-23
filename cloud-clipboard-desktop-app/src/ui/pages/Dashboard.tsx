@@ -10,10 +10,6 @@ type ClipItem = {
 const Dashboard = () => {
 
     const { auth, loading } = useAuth();
-
-    if (loading) return <p>Loading...</p>;
-    if (!auth) return null;
-
     const [clips, setClips] = useState<ClipItem[]>([]);
 
     useEffect(() => {
@@ -22,6 +18,9 @@ const Dashboard = () => {
       });
       return () => window.clips.offNew(listener);
     }, []);
+
+    if (loading) return <p>Loading...</p>;
+    if (!auth) return null;
 
 
   return (

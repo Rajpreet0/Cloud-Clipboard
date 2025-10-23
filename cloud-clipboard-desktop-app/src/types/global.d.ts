@@ -17,6 +17,5 @@ declare global {
       onNew: (cb: (payload: ClipItem) => void) => (...args:any[]) => void;
       offNew: (listener: (...args:any[]) => void) => void;
     };
-    secureStore: {  };
   }
 }
