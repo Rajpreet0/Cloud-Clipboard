@@ -78,15 +78,23 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
                     },
                 });
 
+                let failureCount = 0;
+
                 if (!res.ok) {
-                    await window.secureStore.clearAuth();
-                    setAuth(null);
-                    navigate("/");
+                    failureCount++;
+                    if (failureCount >= 3) {
+                        await window.secureStore.clearAuth();
+                        setAuth(null);
+                        navigate("/");
+                        failureCount = 0; 
+                    }
+                } else {
+                    failureCount = 0;
                 }
             } catch (err) {
                 console.warn("[PING FAILED]", err);
             }
-        }, 600_000);
+        }, 300_000); // 5 Minutes
 
         return () => clearInterval(interval);
     }, [auth?.authToken]);
