@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -25,6 +25,8 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     const navigate = useNavigate();
     const [auth, setAuth] = useState<AuthInfo>(null);
     const [loading, setLoading] = useState(true);
+
+    const failureCountRef = useRef(0);
 
     useEffect(() => {
         async function initAuth() {
@@ -78,18 +80,16 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
                     },
                 });
 
-                let failureCount = 0;
-
                 if (!res.ok) {
-                    failureCount++;
-                    if (failureCount >= 3) {
+                    failureCountRef.current++;
+                    if (failureCountRef.current >= 3) {    
                         await window.secureStore.clearAuth();
                         setAuth(null);
                         navigate("/");
-                        failureCount = 0; 
+                        failureCountRef.current = 0; 
                     }
                 } else {
-                    failureCount = 0;
+                    failureCountRef.current = 0;
                 }
             } catch (err) {
                 console.warn("[PING FAILED]", err);
