@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         const resHeaders = new Headers();
 
         if (origin && allowedOrigins.includes(origin)) {
-        resHeaders.set("Access-Control-Allow-Origin", origin);
+            resHeaders.set("Access-Control-Allow-Origin", origin);
         }
 
         const { code, deviceInfo } = await req.json();

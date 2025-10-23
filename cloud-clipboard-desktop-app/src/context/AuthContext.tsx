@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -25,6 +25,8 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     const navigate = useNavigate();
     const [auth, setAuth] = useState<AuthInfo>(null);
     const [loading, setLoading] = useState(true);
+
+    const failureCountRef = useRef(0);
 
     useEffect(() => {
         async function initAuth() {
@@ -65,6 +67,44 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
 
         initAuth();
     }, []); 
+
+    useEffect(() => {
+        if (!auth?.authToken) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch("http://localhost:3000/api/devices/ping", {
+                    method: "PATCH",
+                    headers: {
+                        Authorization: `Bearer ${auth.authToken}`
+                    },
+                });
+
+                if (!res.ok) {
+                    failureCountRef.current++;
+                    if (failureCountRef.current >= 3) {    
+                        await window.secureStore.clearAuth();
+                        setAuth(null);
+                        navigate("/");
+                        failureCountRef.current = 0; 
+                    }
+                } else {
+                    failureCountRef.current = 0;
+                }
+            } catch (err) {
+                console.warn("[PING FAILED]", err);+
+                failureCountRef.current++;
+                if (failureCountRef.current >= 3) {
+                    await window.secureStore.clearAuth();
+                    setAuth(null);
+                    navigate("/");
+                    failureCountRef.current = 0;
+                }
+            }
+        }, 300_000); // 5 Minutes
+
+        return () => clearInterval(interval);
+    }, [auth?.authToken]);
 
     async function logout() {
         await window.secureStore.clearAuth();
