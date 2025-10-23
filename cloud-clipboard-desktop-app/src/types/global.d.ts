@@ -1,5 +1,11 @@
 export {}
 
+type ClipItem = {
+  type: "text" | "image";
+  data: string;
+};
+
+
 declare global {
   interface Window {
     secureStore: {
@@ -7,5 +13,10 @@ declare global {
       loadAuth: () => Promise<{ authToken: string; deviceId: string } | null>;
       clearAuth: () => Promise<void>;
     };
+    clips: {
+      onNew: (cb: (payload: ClipItem) => void) => (...args:any[]) => void;
+      offNew: (listener: (...args:any[]) => void) => void;
+    };
+    secureStore: {  };
   }
 }

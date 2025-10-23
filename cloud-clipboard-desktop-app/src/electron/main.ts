@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import fs from "fs";
 import { isDev } from "./util.js";
+import { clipboard } from "electron";
 
 function getAuthFilePath() {
     return path.join(app.getPath("userData"), "auth.json");
@@ -44,6 +45,46 @@ app.on("ready", async () => {
 
   createWindow(startPage);
 });
+
+// Clipboard Watch
+let lastText = "";
+let lastImageBase64 = "";
+
+setInterval(() => {
+  const text = clipboard.readText();
+  const image = clipboard.readImage();
+
+  // ==== IMAGE ====
+  if (!image.isEmpty()) {
+    const png = image.toPNG();
+    const base64 = png.toString("base64");
+
+    if (base64 === lastImageBase64) return;
+    lastImageBase64 = base64;
+    lastText = ""; // optional: reset text cache
+
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send("clipboard:new", {
+        type: "image",
+        data: base64
+      });
+    });
+    return;
+  }
+
+  // ==== TEXT ====
+  if (text && text !== lastText) {
+    lastText = text;
+    lastImageBase64 = ""; // optional: reset image cache
+
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send("clipboard:new", {
+        type: "text",
+        data: text
+      });
+    });
+  }
+}, 500);
 
 // Save Token
 ipcMain.handle("save-auth", async (_event, tokenObj) => {
