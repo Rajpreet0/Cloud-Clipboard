@@ -71,38 +71,47 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     useEffect(() => {
         if (!auth?.authToken) return;
 
-        const interval = setInterval(async () => {
-            try {
-                const res = await fetch("http://localhost:3000/api/devices/ping", {
-                    method: "PATCH",
-                    headers: {
-                        Authorization: `Bearer ${auth.authToken}`
-                    },
-                });
+        let interval: ReturnType<typeof setInterval>;
+        let intervalMs = 5 * 60_000;
 
-                if (!res.ok) {
-                    failureCountRef.current++;
-                    if (failureCountRef.current >= 3) {    
-                        await window.secureStore.clearAuth();
-                        setAuth(null);
-                        navigate("/");
-                        failureCountRef.current = 0; 
+        const startHeartbeat = () => {
+            interval = setInterval(async () => {
+                try {
+                    const res = await fetch("http://localhost:3000/api/devices/ping", {
+                        method: "PATCH",
+                        headers: {
+                            Authorization: `Bearer ${auth.authToken}`
+                        },
+                    });
+
+                    if (res.status === 401) {
+                        failureCountRef.current++;
+
+                        intervalMs = 15_000;
+
+                        if (failureCountRef.current >= 3) {
+                            await window.secureStore.clearAuth();
+                            setAuth(null);
+                            navigate("/");
+                            console.log("Auth permanently invalid — logged out");
+                            return clearInterval(interval);
+                        }
+                    } else {
+                        failureCountRef.current = 0;
+                        intervalMs = 5 * 60_000;
                     }
-                } else {
-                    failureCountRef.current = 0;
-                }
-            } catch (err) {
-                console.warn("[PING FAILED]", err);+
-                failureCountRef.current++;
-                if (failureCountRef.current >= 3) {
-                    await window.secureStore.clearAuth();
-                    setAuth(null);
-                    navigate("/");
-                    failureCountRef.current = 0;
-                }
-            }
-        }, 300_000); // 5 Minutes
 
+                } catch (err) {
+                    console.warn("[PING FAILED- NETWORK]", err);
+                }
+
+                clearInterval(interval);
+                startHeartbeat();
+
+            }, intervalMs);
+        }
+
+        startHeartbeat();
         return () => clearInterval(interval);
     }, [auth?.authToken]);
 
