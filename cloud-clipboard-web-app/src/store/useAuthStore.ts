@@ -1,5 +1,6 @@
 "use client";
 
+import { saveUserToDB } from "@/lib/saveUserToDB";
 import { supabase } from "@/lib/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { create } from "zustand";
@@ -32,9 +33,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     const { data } = await supabase.auth.getSession();
     set({ session: data.session, loading: false });
 
+    // Sync if already logged in on load
+    if (data.session?.user) {
+      try {
+        await saveUserToDB(data.session.user);
+      } catch (e) {
+        console.error("Initial sync failed:", e);
+      }
+    }
+
     // Subscribe once to Supabase auth state changes
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       set({ session });
+
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        try {
+          await saveUserToDB(session!.user);
+        } catch (err) {
+          console.error("Failed to sync user:", err);
+        }
+      }
     });
 
     // Cleanup listener on hot reload or page unload

@@ -2,9 +2,7 @@
 
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
-import { saveUserToDB } from "@/lib/saveUserToDB";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useEffect, useState } from "react";
 
 /**
  ** DashboardView component
@@ -23,53 +21,21 @@ const DashboardView = () => {
     // Redirect unauthenticated users to sign-in
     useAuthRedirect({ requireAuth: true });
 
-    const [syncing, setSyncing] = useState(false);
-    const [syncError, setSyncError] = useState<string | null>(null);
-
-    useEffect(() => {
-      // Sync user to DB once the session is available
-      if (!session?.user) return;
-
-      const syncUser = async () => {
-        setSyncing(true);
-        setSyncError(null);
-        try {
-         await saveUserToDB(session.user);
-        } catch (err) { 
-          console.error("Failed to sync user:", err);
-          setSyncError("Failed to sync user data. Please refresh the page.");
-        } finally {
-          setSyncing(false);
-        }
-      };
-      syncUser();
-    }, [session?.user?.id]);
-
-    // Loading or syncing state
-    if (loading || syncing) {
+    if (loading) {
         return (
         <div className="flex items-center justify-center min-h-screen gap-4 bg-gray-50">
             <Spinner/> 
             <p className="text-gray-600 text-lg">
-              {loading ? "Loading your dashboard..." : "Syncing user data..."}
+              Loading your dashboard
             </p>
         </div>
         );
     }
 
-    // Display error if user sync fails
-    if (syncError) {
-      return (
-        <div className="flex items-center justify-center min-h-screen gap-4 bg-red-50">
-          <p className="text-red-600 text-lg">{syncError}</p>
-        </div>
-      )
-    }
-
  
   return (
-    <div>
-
+    <div className="p-4">
+      Logged in as: {session?.user?.email}
     </div>
   )
 }
