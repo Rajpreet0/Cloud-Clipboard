@@ -18,6 +18,17 @@ const Dashboard = () => {
     const [clips, setClips] = useState<ClipItemType[]>([]);
     const [search, setSearch] = useState("");
 
+    // Filter Clips
+    const filteredClips = useMemo(() => {
+      const term = search.toLowerCase();
+      return clips.filter((clip) => 
+        clip.type === "text"
+          ? clip.data.toLowerCase().includes(term)
+          : term === ""
+      );
+    }, [clips, search]);
+
+
     useEffect(() => {
       const listener = window.clips.onNew((payload: Omit<ClipItemType, "timestamp">) => {
         const newClip: ClipItemType = {
@@ -32,15 +43,6 @@ const Dashboard = () => {
     if (loading) return <p>Loading...</p>;
     if (!auth) return null;
 
-    // Filter Clips
-    const filteredClips = useMemo(() => {
-      const term = search.toLowerCase();
-      return clips.filter((clip) => 
-        clip.type === "text"
-          ? clip.data.toLowerCase().includes(term)
-          : term === ""
-      );
-    }, [clips, search]);
 
 
   return (
