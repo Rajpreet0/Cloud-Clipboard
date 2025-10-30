@@ -5,10 +5,10 @@ interface ClipItemProps {
     data: string;
     icon: LucideIcon;
     deviceType: string;
-    clipTimeAgo: string;
+    clipTimestamp: string;
 }
 
-const ClipItem: React.FC<ClipItemProps> = ({type, data, icon: Icon, deviceType, clipTimeAgo }) => {
+const ClipItem: React.FC<ClipItemProps> = ({type, data, icon: Icon, deviceType, clipTimestamp }) => {
   return (
     <div className="p-4 bg-[#275DAD]/20 rounded-lg flex gap-6 ">
         <div className="bg-dark-gray rounded h-fit p-[5px]">
@@ -27,7 +27,7 @@ const ClipItem: React.FC<ClipItemProps> = ({type, data, icon: Icon, deviceType, 
             )}
             <div className="mt-8 flex w-full items-center justify-between">
                 <p className="text-sm text-gray-500">{deviceType}</p>
-                <p className="text-sm text-gray-500">{clipTimeAgo}</p>
+                <p className="text-sm text-gray-500">{clipTimestamp}</p>
             </div>
         </div>
     </div>
