@@ -48,9 +48,9 @@ export async function POST(req: Request) {
             device = await prisma.device.update({
                 where: { id: existingPending.id },
                 data: {
-                verificationCode: code,
-                codeExpiresAt: expiresAt,
-                type: type ?? "desktop",
+                    verificationCode: code,
+                    codeExpiresAt: expiresAt,
+                    deviceType: type ?? "desktop",
                 },
             });
         } else {
@@ -60,11 +60,10 @@ export async function POST(req: Request) {
                 userId,
                 verificationCode: code,
                 codeExpiresAt: expiresAt,
-                type: type ?? "desktop",
                 fingerprint: "PENDING",
                 browser: "unknown",
                 os: "unknown",
-                deviceType: "unknown",
+                deviceType: type ?? "desktop",
                 ip: "unknown",
                 },
             }); 

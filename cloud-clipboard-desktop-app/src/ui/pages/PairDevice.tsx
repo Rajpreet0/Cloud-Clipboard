@@ -17,18 +17,20 @@ const PairDevice = () => {
       setStatus("loading");
       setMessage("");
 
+      const deviceInfo = {
+        browser: "Desktop App",
+        os: window.navigator.platform,
+        deviceType: "Desktop",
+        fingerprint: crypto.randomUUID(), 
+        ip: "Unknown",   
+      }
+
       const res = await fetch("http://localhost:3000/api/devices/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code,
-          deviceInfo: {
-            browser: "Desktop App",
-            os: window.navigator.platform,
-            deviceType: "Desktop",
-            fingerprint: crypto.randomUUID(),
-            ip: "Unkown" //TODO: OPTIONAL FETCH 
-          }
+          deviceInfo
         })
       });
 
@@ -39,6 +41,7 @@ const PairDevice = () => {
       await window.secureStore.saveAuth({
         authToken: data.authToken,
         deviceId: data.deviceId,
+        deviceInfo,
       });
 
       const meRes = await fetch("http://localhost:3000/api/devices/me", {
