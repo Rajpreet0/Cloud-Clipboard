@@ -20,7 +20,6 @@ const ClipItem: React.FC<ClipItemProps> = ({type, data, icon: Icon, deviceType, 
         return "plaintext";
     };
 
-    const language = detectLanguage(data);
 
   return (
     <div className="p-4 bg-[#275DAD]/20 rounded-lg flex gap-6 ">
@@ -35,7 +34,7 @@ const ClipItem: React.FC<ClipItemProps> = ({type, data, icon: Icon, deviceType, 
             {type === "code" && (
                 <div className="rounded-md overflow-hidden max-w-2xl  border-gray-300">
                     <SyntaxHighlighter
-                        language={language}
+                        language={detectLanguage(data)}
                         style={oneDark}
                         showLineNumbers
                         customStyle={{
