@@ -1,21 +1,17 @@
 import ClipItem from "@/components/ClipItem";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/context/AuthContext";
+import { useClips } from "@/context/ClipsContext";
 import { formatTimestamp } from "@/lib/formatTime";
+import { getDeviceInfo } from "@/lib/getDeviceInfo";
 import { CircleCheck, Laptop, RefreshCcw, SearchIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 
-type ClipItemType = {
-  type:"text"|"image";
-  data:string;
-  timestamp: number;
-};
-
 const Dashboard = () => {
 
     const { auth, loading } = useAuth();
-    const [clips, setClips] = useState<ClipItemType[]>([]);
+    const { clips, addClip } = useClips();
     const [search, setSearch] = useState("");
 
     // Filter Clips
@@ -30,15 +26,33 @@ const Dashboard = () => {
 
 
     useEffect(() => {
-      const listener = window.clips.onNew((payload: Omit<ClipItemType, "timestamp">) => {
-        const newClip: ClipItemType = {
+      const listener = window.clips.onNew((payload) => {
+
+        const {os, browser, deviceType} = getDeviceInfo();
+
+        let detectedType: "text" | "image" | "code" = payload.type;
+        if (payload.type === "text") {
+          if (
+            /function|const|let|=>|import|class|def|#include|console\.log/.test(payload.data)
+          ) {
+            detectedType = "code";
+          }
+        }
+
+        const newClip = {
           ...payload,
+          type: detectedType,
           timestamp: Date.now(),
+          os,
+          browser,
+          deviceType,
         };
-        setClips((prev) => [newClip, ...prev]);
+
+
+        addClip(newClip);
       });
       return () => window.clips.offNew(listener);
-    }, []);
+    }, [addClip]);
 
     if (loading) return <p>Loading...</p>;
     if (!auth) return null;
@@ -73,7 +87,7 @@ const Dashboard = () => {
             type={clip.type}
             data={clip.data}
             icon={Laptop}
-            deviceType="MacBook Air"
+            deviceType={`${clip.os} (${clip.browser})`}
             clipTimestamp={formatTimestamp(clip.timestamp)}
           />
         ))
