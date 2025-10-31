@@ -55,7 +55,7 @@ export async function POST(req: Request) {
                 verificationCode: null,
                 codeExpiresAt: null,
                 isOnline: true,
-                browser: deviceInfo?.browser ?? "Desktop",
+                browser: deviceInfo?.browser ?? "Desktop App",
                 os: deviceInfo?.os ?? "Unknown",
                 deviceType: deviceInfo?.deviceType ?? "Desktop",
                 ip: deviceInfo?.ip ?? "Unknown",

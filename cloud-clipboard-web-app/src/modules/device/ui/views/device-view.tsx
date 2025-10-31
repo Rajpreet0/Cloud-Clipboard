@@ -17,6 +17,7 @@ interface Device {
     ip: string;
     fingerprint: string;
     lastSeenAt: string;
+    isOnline: boolean;
 }
 
 /**
@@ -136,7 +137,7 @@ const DeviceView = () => {
           ip={device.ip}
           fingerprint={device.fingerprint}
           lastSeenAt={new Date(device.lastSeenAt).toLocaleString()}
-          isOnline={currentDevice?.fingerprint === device.fingerprint}
+          isOnline={device.isOnline}
           onLogout={() => handleDeviceLogout(device.id)}
         />
       ))}
